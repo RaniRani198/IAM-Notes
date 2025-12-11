@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Resource-based policy for S3 bucket
+
+Resources:
+  CurationBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: my-curation-bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowDataOpsRole
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::123456789012:role/DataOps-Execution-Role
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: arn:aws:s3:::my-curation-bucket/*
+
+          - Sid: EnforceEncryptedUploads
+            Effect: Deny
+            Principal: "*"
+            Action:
+              - s3:PutObject
+            Resource: arn:aws:s3:::my-curation-bucket/*
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption: "aws:kms"
