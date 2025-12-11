@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2012-10-17'
+Description: KMS key policy to allow DataOps role access
+
+Resources:
+  DataOpsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: KMS key for EMR/Glue/S3 encryption
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowRoot
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::123456789012:root
+            Action: "kms:*"
+            Resource: "*"
+
+          - Sid: AllowDataOpsRole
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::123456789012:role/DataOps-Execution-Role
+            Action:
+              - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey
+            Resource: "*"
