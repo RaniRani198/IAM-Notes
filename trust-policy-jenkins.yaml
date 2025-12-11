@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Trust policy for Jenkins or EMR/Glue services
+
+Resources:
+  JenkinsDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Jenkins-Deployment-Role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - arn:aws:iam::123456789012:role/svc.jenkins.dep
+                - arn:aws:iam::123456789012:role/svc.jenkins.redep-con
+            Action: sts:AssumeRole
