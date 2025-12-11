@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Permission Boundary for DataOps Roles
+
+Resources:
+  DataOpsPB:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: PermBoundary-DataOps
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCoreServices
+            Effect: Allow
+            Action:
+              - s3:ListBucket
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
+              - glue:StartJobRun
+              - glue:GetJobRun
+              - emr-serverless:GetJobRun
+              - emr-serverless:StartJobRun
+            Resource: "*"
+
+          - Sid: AllowPassRole
+            Effect: Allow
+            Action: iam:PassRole
+            Resource: "arn:aws:iam::123456789012:role/*"
+
+          - Sid: RestrictIAMWildcards
+            Effect: Deny
+            Action:
+              - iam:CreateUser
+              - iam:DeleteUser
+              - iam:PutRolePolicy
+              - iam:CreateRole
+            Resource: "*"
+
+          - Sid: ForceKMSUsage
+            Effect: Deny
+            Action: s3:PutObject
+            Resource: "*"
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption: "aws:kms"
